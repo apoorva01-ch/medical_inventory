@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Sale</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f4f9f9;
+    padding:30px;
+}
+.card{
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+@media print{
+    .no-print{
+        display:none;
+    }
+    body{
+        background:white;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card p-4">
+
+<h4 class="mb-4">New Sale</h4>
+
+<!-- Invoice Section -->
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label class="form-label">Invoice No</label>
+        <input type="text" id="invoiceNo" class="form-control" readonly>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Sale Date</label>
+        <input type="date" id="saleDate" class="form-control">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Payment Status</label>
+        <select class="form-control">
+            <option>Paid</option>
+            <option>Pending</option>
+            <option>Partial</option>
+        </select>
+    </div>
+</div>
+
+<!-- Customer -->
+<div class="mb-4">
+    <label class="form-label">Customer Name</label>
+    <input type="text" class="form-control" placeholder="Enter customer name">
+</div>
+
+<!-- Medicines Table -->
+<table class="table table-bordered" id="medicineTable">
+    <thead class="table-light">
+        <tr>
+            <th>Medicine</th>
+            <th>Price</th>
+            <th>Qty</th>
+            <th>Total</th>
+            <th class="no-print">Action</th>  
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><input type="text" class="form-control"></td>
+            <td><input type="number" class="form-control price" oninput="calculate(this)"></td>
+            <td><input type="number" class="form-control qty" oninput="calculate(this)"></td>
+            <td><input type="number" class="form-control total" readonly></td>
+            <td class="no-print">
+                <button class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<button class="btn btn-secondary no-print mb-3" onclick="addRow()">+ Add Medicine</button>
+
+<!-- Grand Total -->
+<div class="text-end">
+    <h5>Grand Total: ₹ <span id="grandTotal">0</span></h5>
+</div>
+
+<div class="text-end mt-4 no-print">
+    <button class="btn btn-primary"><a href="sales.html " style="color: white;text-decoration: none;">Save Sale</a></button>
+    <button onclick="window.print()" class="btn btn-success">Print Invoice</button>
+</div>
+
+</div>
+</div>
+
+<script>
+
+// Generate Invoice Number
+function generateInvoice(){
+    const random = Math.floor(Math.random() * 100000);
+    document.getElementById("invoiceNo").value = "INV-" + random;
+}
+generateInvoice();
+
+// Set today date
+document.getElementById("saleDate").value = new Date().toISOString().split('T')[0];
+
+// Add new row
+function addRow(){
+    const table = document.getElementById("medicineTable").getElementsByTagName('tbody')[0];
+    const newRow = table.insertRow();
+
+    newRow.innerHTML = `
+        <td><input type="text" class="form-control"></td>
+        <td><input type="number" class="form-control price" oninput="calculate(this)"></td>
+        <td><input type="number" class="form-control qty" oninput="calculate(this)"></td>
+        <td><input type="number" class="form-control total" readonly></td>
+        <td class="no-print">
+            <button class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button>
+        </td>
+    `;
+}
+
+// Remove row
+function removeRow(btn){
+    btn.closest("tr").remove();
+    updateGrandTotal();
+}
+
+// Calculate row total
+function calculate(element){
+    const row = element.closest("tr");
+    const price = row.querySelector(".price").value || 0;
+    const qty = row.querySelector(".qty").value || 0;
+    const total = price * qty;
+    row.querySelector(".total").value = total;
+    updateGrandTotal();
+}
+
+// Update grand total
+function updateGrandTotal(){
+    let grandTotal = 0;
+    const totals = document.querySelectorAll(".total");
+    totals.forEach(input=>{
+        grandTotal += parseFloat(input.value) || 0;
+    });
+    document.getElementById("grandTotal").innerText = grandTotal;
+}
+
+</script>
+
+</body>
+</html>
